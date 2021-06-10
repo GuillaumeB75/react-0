@@ -1,25 +1,79 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+// localstorage
+// localstorage hook
+// conditional rendering
+// useEffect
 
-function App() {
+function NumberInput({ id, type, value, onInputChange, children }) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <label htmlFor={id}>{children}</label>
+      <input id={id} type={type} value={value} onChange={onInputChange} />
+    </>
+  )
 }
 
-export default App;
+function Counter({ initialStep, onCount }) {
+  const [count, setCount] = useState(0)
+  const [step, setStep] = useState(initialStep)
+
+  const handleIncrement = () => {
+    setCount((cur) => cur + step)
+    onCount((cur) => Number(cur) + 1)
+  }
+
+  const handleDecrement = () => {
+    setCount((cur) => cur - step)
+    onCount((cur) => Number(cur) + 1)
+  }
+
+  const handleStepChange = (event) => {
+    if (!isNaN(event.target.value)) {
+      setStep(Number(event.target.value))
+    }
+  }
+
+  return (
+    <>
+      {console.log('Counter rendered')}
+      <p>
+        count:{count} <button onClick={() => setCount(0)}>reset</button>
+      </p>
+      <button onClick={handleIncrement}>+</button>
+      <button onClick={handleDecrement}>-</button>
+      <NumberInput
+        id="step"
+        type="text"
+        value={step}
+        onInputChange={handleStepChange}
+      >
+        step:
+      </NumberInput>
+    </>
+  )
+}
+
+const useLocalStorage = (key, initialValue) => {
+  const [value, setValue] = useState(localStorage.getItem(key) || initialValue)
+
+  useEffect(() => {
+    localStorage.setItem(key, value)
+  }, [key, value])
+
+  return [value, setValue]
+}
+
+function App() {
+  const [nbOp, setNbOp] = useLocalStorage('nbOp', 0)
+
+  return (
+    <>
+      {console.log('App rendered')}
+      <h1>Hello HardFork</h1>
+      <p>nb operations: {nbOp}</p>
+      <Counter initialStep={20} onCount={setNbOp} />
+    </>
+  )
+}
+
+export default App
